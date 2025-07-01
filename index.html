@@ -2,22 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>angel-ai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angel AI</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers"></script>
 </head>
 <body>
   <div class="chat-container">
-    <div id="chat" class="chat-box">
-      <div class="message ai">Angel is here 😇</div>
+    <div id="chat-log"></div>
+    <div class="input-container">
+      <input type="text" id="user-input" placeholder="Type something..." />
+      <button onclick="sendMessage()">Send</button>
     </div>
-    <form id="chat-form" autocomplete="off">
-      <input type="text" id="user-input" placeholder="Talk to Angel..." required />
-      <button type="submit">Send</button>
-    </form>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers"></script>
   <script src="script.js"></script>
 </body>
 </html>
