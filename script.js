@@ -1,12 +1,12 @@
 let pipeline;
 
 window.onload = async () => {
-  document.getElementById("chat-log").innerHTML += `<div class="message bot">Loading model...</div>`;
+  document.getElementById("chat-log").innerHTML += `<div class="message bot">Loading model...`;
   pipeline = await window.transformers.pipeline('text-generation', 'Xenova/gpt2');
   document.getElementById("chat-log").innerHTML += `<div class="message bot">Angel AI ready. Ask anything.</div>`;
 };
 
-async function sendMessage() {
+window.sendMessage = async () => {
   const inputField = document.getElementById("user-input");
   const userText = inputField.value.trim();
   if (!userText) return;
@@ -23,7 +23,7 @@ async function sendMessage() {
 
   const botText = response[0].generated_text.replace(userText, '').trim();
   addMessage(botText, 'bot');
-}
+};
 
 function addMessage(text, sender) {
   const message = document.createElement('div');
