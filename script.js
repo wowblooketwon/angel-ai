@@ -1,9 +1,16 @@
 let pipeline;
+let modelReady = false;
 
 async function loadModel() {
-  const { pipeline: pipe } = window.transformers;
-  pipeline = await pipe('text-generation', 'Xenova/gpt2');
-  console.log('Angel loaded 👼');
+  try {
+    const { pipeline: pipe } = window.transformers;
+    pipeline = await pipe('text-generation', 'Xenova/gpt2');
+    modelReady = true;
+    addMessage("Angel loaded 👼", 'ai');
+  } catch (err) {
+    console.error('Failed to load model:', err);
+    addMessage("Couldn't load Angel 😢", 'ai');
+  }
 }
 
 loadModel();
@@ -22,15 +29,26 @@ function addMessage(text, sender) {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  if (!modelReady) {
+    addMessage("Angel's still loadin ⏳", 'ai');
+    return;
+  }
+
   const userText = input.value.trim();
   if (!userText) return;
 
   addMessage(userText, 'user');
   input.value = '';
-
   addMessage('Angel typin...', 'ai');
 
-  const outputs = await pipeline(userText, { max_new_tokens: 50 });
-  document.querySelector('.message.ai:last-child').remove();
-  addMessage(outputs[0].generated_text.replace(userText, '').trim(), 'ai');
+  try {
+    const output = await pipeline(userText, { max_new_tokens: 40 });
+    const reply = output[0].generated_text.replace(userText, '').trim();
+    document.querySelector('.message.ai:last-child').remove();
+    addMessage(reply || "Angel ain't got nun to say 😶", 'ai');
+  } catch (err) {
+    console.error('AI error:', err);
+    addMessage("Angel messed up 😢", 'ai');
+  }
 });
