@@ -1,54 +1,34 @@
 let pipeline;
-let modelReady = false;
 
-async function loadModel() {
-  try {
-    const { pipeline: pipe } = window.transformers;
-    pipeline = await pipe('text-generation', 'Xenova/gpt2');
-    modelReady = true;
-    addMessage("Angel loaded 👼", 'ai');
-  } catch (err) {
-    console.error('Failed to load model:', err);
-    addMessage("Couldn't load Angel 😢", 'ai');
-  }
-}
+window.onload = async () => {
+  document.getElementById("chat-log").innerHTML += `<div class="message bot">Loading model...</div>`;
+  pipeline = await window.transformers.pipeline('text-generation', 'Xenova/gpt2');
+  document.getElementById("chat-log").innerHTML += `<div class="message bot">Angel AI ready. Ask anything.</div>`;
+};
 
-loadModel();
-
-const chatBox = document.getElementById('chat');
-const form = document.getElementById('chat-form');
-const input = document.getElementById('user-input');
-
-function addMessage(text, sender) {
-  const msg = document.createElement('div');
-  msg.className = `message ${sender}`;
-  msg.textContent = text;
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  if (!modelReady) {
-    addMessage("Angel's still loadin ⏳", 'ai');
-    return;
-  }
-
-  const userText = input.value.trim();
+async function sendMessage() {
+  const inputField = document.getElementById("user-input");
+  const userText = inputField.value.trim();
   if (!userText) return;
 
   addMessage(userText, 'user');
-  input.value = '';
-  addMessage('Angel typin...', 'ai');
+  inputField.value = '';
 
-  try {
-    const output = await pipeline(userText, { max_new_tokens: 40 });
-    const reply = output[0].generated_text.replace(userText, '').trim();
-    document.querySelector('.message.ai:last-child').remove();
-    addMessage(reply || "Angel ain't got nun to say 😶", 'ai');
-  } catch (err) {
-    console.error('AI error:', err);
-    addMessage("Angel messed up 😢", 'ai');
-  }
-});
+  const response = await pipeline(userText, {
+    max_new_tokens: 60,
+    temperature: 0.7,
+    top_k: 50,
+    repetition_penalty: 1.1,
+  });
+
+  const botText = response[0].generated_text.replace(userText, '').trim();
+  addMessage(botText, 'bot');
+}
+
+function addMessage(text, sender) {
+  const message = document.createElement('div');
+  message.className = `message ${sender}`;
+  message.innerText = text;
+  document.getElementById("chat-log").appendChild(message);
+  document.getElementById("chat-log").scrollTop = document.getElementById("chat-log").scrollHeight;
+}
